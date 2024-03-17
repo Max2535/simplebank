@@ -2,3 +2,32 @@ SELECT *  FROM pg_stat_activity a
 JOIN pg_locks l ON l.pid=a.pid
 WHERE a.application_name='psql'
 ORDER BY a.pid
+
+
+ wsl --install
+sudo snap install go --classic
+sudo snap install sqlc
+go version
+docker run --name postgres12 -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:12-alpine
+
+docker exec -it postgres12 psql -U root
+docker logs postgres12
+2024.03.17 Sunday
+migrate create -ext sql -dir db/migration -seq init_schema
+
+docker exec -it postgres12 /bin/sh
+
+docker exec -it postgres12 createdb --username=root --owner=root simple_bank
+docker exec -it postgres12 psql simple_bank
+dropdb simple_bank
+make postgres
+go mod init github.com/Max2535/simplebank
+go mod tidy
+mkdir -p .github/workflows
+go get github.com/gin-gonic/gin
+go get github.com/spf13/viper
+
+mockgen -destination db/mock/store.go github.com/Max2535/simplebank/db/sqlc Store
+go get github.com/golang/mock/mockgen/model
+mockgen -package mockdb -destination db/mock/store.go github.com/Max2535/simplebank/db/sqlc Store
+migrate create -ext sql -dir db/migration -seq add_users
