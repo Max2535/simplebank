@@ -1,7 +1,11 @@
 package api
 
 import (
+	"fmt"
+
 	db "github.com/Max2535/simplebank/db/sqlc"
+	"github.com/Max2535/simplebank/token"
+	"github.com/Max2535/simplebank/util"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
@@ -9,29 +13,46 @@ import (
 
 // Server servers
 type Server struct {
-	store  db.Store
-	router *gin.Engine
+	config     util.Config
+	store      db.Store
+	tokenMaker token.Maker
+	router     *gin.Engine
 }
 
 // New server creates a new HTTP server and setup routing
-func NewServer(store db.Store) *Server {
-	server := &Server{store: store}
-	router := gin.Default()
+func NewServer(config util.Config, store db.Store) (*Server, error) {
+	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
+	//tokenMaker, err := token.NewJWTMaker(config.TokenSymmetricKey)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create token maker: %w", err)
+	}
+
+	server := &Server{
+		config:     config,
+		store:      store,
+		tokenMaker: tokenMaker,
+	}
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("currency", validCurrency)
 	}
+	server.setupRouter()
+	return server, nil
+}
 
-	router.POST("users", server.createUser)
+func (server *Server) setupRouter() {
+	router := gin.Default()
 
-	router.POST("accounts", server.createAccount)
-	router.GET("accounts/:id", server.getAccount)
-	router.GET("accounts", server.listAccounts)
+	router.POST("api/users", server.createUser)
+	router.POST("api/users/login", server.loginUser)
 
-	router.POST("transfers", server.createTransfer)
+	router.POST("api/accounts", server.createAccount)
+	router.GET("api/accounts/:id", server.getAccount)
+	router.GET("api/accounts", server.listAccounts)
+
+	router.POST("api/transfers", server.createTransfer)
 
 	server.router = router
-	return server
 }
 
 // Start runs the HTTP server on a specific adderss.
