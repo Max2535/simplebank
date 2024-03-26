@@ -31,3 +31,5 @@ mockgen -destination db/mock/store.go github.com/Max2535/simplebank/db/sqlc Stor
 go get github.com/golang/mock/mockgen/model
 mockgen -package mockdb -destination db/mock/store.go github.com/Max2535/simplebank/db/sqlc Store
 migrate create -ext sql -dir db/migration -seq add_users
+
+brew upgrade golang-migrate
