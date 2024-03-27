@@ -37,3 +37,4 @@ docker build -t simplebank:latest .
 docker run --name simplebank -p 8080:8080 simplebank:latest
 docker network create bank-network
 
+migrate create -ext sql -dir db/migration -seq add_sessions

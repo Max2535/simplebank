@@ -1,4 +1,4 @@
-name: ci-test
+name: Run unit tests
 
 on:
   push:
@@ -47,5 +47,8 @@ jobs:
     - name: Run migrations
       run: make migrateup
 
-    # - name: Test
-    #   run: make test
+    - name: Run Mock
+      run: make mock
+
+    - name: Test
+      run: make test
