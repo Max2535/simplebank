@@ -33,3 +33,6 @@ mockgen -package mockdb -destination db/mock/store.go github.com/Max2535/simpleb
 migrate create -ext sql -dir db/migration -seq add_users
 
 brew upgrade golang-migrate
+docker build -t simplebank:latest .
+docker run --name simplebank -p 8080:8080 simplebank:latest
+docker network create bank-network
